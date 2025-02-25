@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essay Generator by YUAN JIE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 600px;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 {
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            align-self: flex-start;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: block;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 150px;
+            resize: none;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+        .loader {
+            display: none;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .output-container {
+            position: relative;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Essay Generator by YUAN JIE</h1>
+        <label for="topic">Topic:</label>
+        <input type="text" id="topic" placeholder="Enter topic">
+        <label for="language">Language:</label>
+        <select id="language">
+            <option value="English">English</option>
+            <option value="Chinese">Chinese</option>
+            <option value="Malay">Malay</option>
+        </select>
+        <label for="length">Word Count:</label>
+        <input type="number" id="length" placeholder="Enter word count">
+        <label for="note">Additional Note:</label>
+        <textarea id="note" placeholder="Enter additional note"></textarea>
+        <div class="button-group">
+            <button onclick="generateEssay()">Generate Essay</button>
+            <button onclick="copyText()">Copy</button>
+            <button onclick="exportToWord()">Export to Word</button>
+        </div>
+        <h2>Generated Essay:</h2>
+        <div class="output-container">
+            <textarea id="output" readonly></textarea>
+            <div class="loader" id="loader"></div>
+        </div>
+    </div>
+
+    <script>
+        async function generateEssay() {
+            const topic = document.getElementById('topic').value;
+            const language = document.getElementById('language').value;
+            const length = document.getElementById('length').value;
+            const note = document.getElementById('note').value;
+
+            document.getElementById('output').value = "";
+            document.getElementById('loader').style.display = 'block';
+
+            const response = await fetch('/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic, language, length, note })
+            });
+
+            const data = await response.json();
+            document.getElementById('output').value = data.essay + "\n\nWord Count: " + data.wordCount;
+
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function copyText() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
+        }
+
+        function exportToWord() {
+            const output = document.getElementById('output').value;
+            const topic = document.getElementById('topic').value || "essay";
+            const blob = new Blob(['\ufeff' + output], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = topic.replace(/\s+/g, '_') + '.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>

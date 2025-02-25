@@ -54,14 +54,31 @@
             justify-content: center;
         }
         button {
-            background-color: #007BFF;
-            color: white;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 10px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s;
+            font-size: 14px;
+            margin-top: 20px
+        }
+        svg {
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            vertical-align: baseline
+        }
+        
+        #copy-button,#export-button,#fullscreen-button         {
+            background-color: #333;
+            color: #fff;
+            width:40px;
+            height:40px;
+            margin-top:10px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #292727;
         }
         .button-group {
             display: flex;
@@ -110,8 +127,9 @@
         <textarea id="note" placeholder="Enter additional note"></textarea>
         <div class="button-group">
             <button onclick="generateEssay()">Generate Essay</button>
-            <button onclick="copyText()">Copy</button>
-            <button onclick="exportToWord()">Export to Word</button>
+            <button id="copy-button" onclick="copyText()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z"></path></svg></button>
+            <button id="export-button"  onclick="exportToWord()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="#ffffff" d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM111 257.1l26.8 89.2 31.6-90.3c3.4-9.6 12.5-16.1 22.7-16.1s19.3 6.4 22.7 16.1l31.6 90.3L273 257.1c3.8-12.7 17.2-19.9 29.9-16.1s19.9 17.2 16.1 29.9l-48 160c-3 10-12 16.9-22.4 17.1s-19.8-6.2-23.2-16.1L192 336.6l-33.3 95.3c-3.4 9.8-12.8 16.3-23.2 16.1s-19.5-7.1-22.4-17.1l-48-160c-3.8-12.7 3.4-26.1 16.1-29.9s26.1 3.4 29.9 16.1z"/></svg></button>
+            <button id="fullscreen-button"  onclick="toggleFullscreen()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#ffffff" d="M32 32C14.3 32 0 46.3 0 64l0 96c0 17.7 14.3 32 32 32s32-14.3 32-32l0-64 64 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L32 32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7 14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-64 0 0-64zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32l64 0 0 64c0 17.7 14.3 32 32 32s32-14.3 32-32l0-96c0-17.7-14.3-32-32-32l-96 0zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 64-64 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32l0-96z"></path></svg></button>
         </div>
         <h2>Generated Essay:</h2>
         <div class="output-container">
@@ -160,6 +178,15 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+        }
+        
+        function toggleFullscreen() {
+            const outputTextarea = document.getElementById("output");
+            if (!document.fullscreenElement) {
+                outputTextarea.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
         }
     </script>
 </body>

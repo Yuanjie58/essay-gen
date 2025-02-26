@@ -1,37 +1,58 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const path = require("path");
+const fs = require("fs");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-require('dotenv').config();
+require("dotenv").config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-// In-memory storage for generated essays
+const ESSAYS_FILE = path.join(__dirname, "essays.json");
+
+// ✅ **Load essays from JSON file (if exists)**
 let essays = [];
+if (fs.existsSync(ESSAYS_FILE)) {
+    try {
+        const data = fs.readFileSync(ESSAYS_FILE, "utf8");
+        essays = data ? JSON.parse(data) : [];
+    } catch (error) {
+        console.error("⚠️ Error reading JSON file:", error);
+        essays = [];
+    }
+}
 
-// Serve index.html (User Interface)
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// ✅ **Save essays to JSON file**
+function saveEssaysToFile() {
+    try {
+        fs.writeFileSync(ESSAYS_FILE, JSON.stringify(essays, null, 2));
+    } catch (error) {
+        console.error("⚠️ Error saving essays:", error);
+    }
+}
+
+// ✅ **Serve index.html (User Interface)**
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Serve admin.html (Admin Dashboard)
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+// ✅ **Serve admin.html (Admin Dashboard)**
+app.get("/admin", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "admin.html"));
 });
 
+// ✅ **Admin Login**
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
-// Admin login endpoint
 app.post("/admin-login", (req, res) => {
     const { username, password } = req.body;
 
@@ -42,12 +63,12 @@ app.post("/admin-login", (req, res) => {
     }
 });
 
-// Endpoint to generate essay using Gemini AI API
-app.post('/generate', async (req, res) => {
+// ✅ **Generate Essay & Save to JSON File**
+app.post("/generate", async (req, res) => {
     const { topic, language, length, note, device, browser, os } = req.body;
 
     if (!topic || !language || !length) {
-        return res.status(400).json({ error: 'Topic, language, and length are required' });
+        return res.status(400).json({ error: "Topic, language, and length are required" });
     }
 
     try {
@@ -58,12 +79,13 @@ app.post('/generate', async (req, res) => {
         }
 
         const result = await model.generateContent(prompt);
-        const text = result.response.candidates?.[0]?.content?.parts?.[0]?.text || "Error: No response from AI.";
+        const text =
+            result.response.candidates?.[0]?.content?.parts?.[0]?.text || "Error: No response from AI.";
 
-        // Calculate word count
+        // ✅ Calculate word count
         const wordCount = text.match(/[\u00ff-\uffff]|\S+/g).length;
 
-        // Save the essay for admin monitoring
+        // ✅ Ensure Device, Browser, and OS are saved
         const essayData = {
             topic,
             language,
@@ -71,26 +93,26 @@ app.post('/generate', async (req, res) => {
             wordCount,
             timestamp: new Date().toLocaleString(),
             essay: text,
-            device,
-            browser,
-            os
+            device: device || "Unknown",  // ✅ Default to "Unknown" if not provided
+            browser: browser || "Unknown",
+            os: os || "Unknown"
         };
         essays.push(essayData);
+        saveEssaysToFile(); // ✅ Save to JSON file
 
         res.json({ essay: text, wordCount });
     } catch (error) {
         console.error("Error generating essay:", error);
-        res.status(500).json({ error: 'Failed to generate essay' });
+        res.status(500).json({ error: "Failed to generate essay" });
     }
 });
 
-
-// Endpoint for admin to retrieve all generated essays
-app.get('/getEssays', (req, res) => {
+// ✅ **Retrieve All Essays for Admin**
+app.get("/getEssays", (req, res) => {
     res.json(essays);
 });
 
-// Start the server
+// ✅ **Start the Server**
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`✅ Server running on http://localhost:${PORT}`);
 });

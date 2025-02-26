@@ -63,6 +63,19 @@ app.post("/admin-login", (req, res) => {
     }
 });
 
+function getMalaysiaTime() {
+    return new Intl.DateTimeFormat("en-MY", {
+        timeZone: "Asia/Kuala_Lumpur",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    }).format(new Date());
+}
+
 // ✅ **Generate Essay & Save to JSON File**
 app.post("/generate", async (req, res) => {
     const { topic, language, length, note, device, browser, os } = req.body;
@@ -91,7 +104,7 @@ app.post("/generate", async (req, res) => {
             language,
             length,
             wordCount,
-            timestamp: new Date().toLocaleString(),
+            timestamp: getMalaysiaTime(), // ✅ Save Malaysia Time
             essay: text,
             device: device || "Unknown",  // ✅ Default to "Unknown" if not provided
             browser: browser || "Unknown",

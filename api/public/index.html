@@ -168,15 +168,15 @@
     <script>
         function getUserDeviceInfo() {
             const userAgent = navigator.userAgent;
-            let deviceType = "Desktop";
+            let device = "Desktop";
 
-            if (/Mobi|Android/i.test(userAgent)) deviceType = "Mobile";
-            else if (/iPad|Tablet/i.test(userAgent)) deviceType = "Tablet";
+            if (/Mobi|Android/i.test(userAgent)) device = "Mobile";
+            else if (/iPad|Tablet/i.test(userAgent)) device = "Tablet";
 
             return {
-                device: deviceType,
-                browser: navigator.userAgent.match(/(firefox|msie|trident|chrome|safari|edge)/i)[0],
-                os: navigator.platform
+                device,
+                browser: userAgent.match(/(firefox|msie|trident|chrome|safari|edge)/i)?.[0] || "Unknown",
+                os: navigator.platform || "Unknown"
             };
         }
 
@@ -192,16 +192,20 @@
                 return;
             }
 
-            output.value = "Generating essay..."; // Show loading text
+            output.value = "Generating essay..."; 
 
             try {
                 const userDeviceInfo = getUserDeviceInfo();
+
                 const response = await fetch("/generate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ topic, language, length, note,device: userDeviceInfo.device, 
-                                         browser: userDeviceInfo.browser, 
-                                         os: userDeviceInfo.os })
+                    body: JSON.stringify({ 
+                        topic, language, length, note, 
+                        device: userDeviceInfo.device, 
+                        browser: userDeviceInfo.browser, 
+                        os: userDeviceInfo.os 
+                    })
                 });
 
                 if (!response.ok) {
@@ -209,21 +213,19 @@
                 }
 
                 const data = await response.json();
-
                 if (data.essay) {
                     output.value = data.essay;
-                    const wordCount = updateWordCount();
-                    saveHistory(topic, data.essay, wordCount);
-                    
+                        const wordCount = updateWordCount();
+                        saveHistory(topic, data.essay, wordCount);
                 } else {
                     throw new Error(data.error || "Failed to generate essay.");
                 }
             } catch (error) {
-                console.error("Fetch Error:", error);
                 alert(`❌ Error: ${error.message}`);
                 output.value = "";
             }
         }
+
 
         function updateWordCount() {
             const output = document.getElementById("output").value.trim();

@@ -63,19 +63,6 @@ app.post("/admin-login", (req, res) => {
     }
 });
 
-function getMalaysiaTime() {
-    return new Intl.DateTimeFormat("en-MY", {
-        timeZone: "Asia/Kuala_Lumpur",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false
-    }).format(new Date());
-}
-
 // ✅ **Generate Essay & Save to JSON File**
 app.post("/generate", async (req, res) => {
     const { topic, language, length, note, device, browser, os } = req.body;
@@ -104,7 +91,7 @@ app.post("/generate", async (req, res) => {
             language,
             length,
             wordCount,
-            timestamp: getMalaysiaTime(), // ✅ Save Malaysia Time
+            timestamp: new Date().toLocaleString(),
             essay: text,
             device: device || "Unknown",  // ✅ Default to "Unknown" if not provided
             browser: browser || "Unknown",
@@ -124,6 +111,28 @@ app.post("/generate", async (req, res) => {
 app.get("/getEssays", (req, res) => {
     res.json(essays);
 });
+
+app.post("/improveSentence", async (req, res) => {
+    const { sentence } = req.body;
+
+    if (!sentence) {
+        return res.status(400).json({ error: "No sentence provided." });
+    }
+
+    try {
+        let prompt = `Improve the following sentence : "${sentence}"only give the improved sentence only `;
+
+        const result = await model.generateContent(prompt);
+        const improvedSentence =
+            result.response.candidates?.[0]?.content?.parts?.[0]?.text || sentence;
+
+        res.json({ improvedSentence });
+    } catch (error) {
+        console.error("Error improving sentence:", error);
+        res.status(500).json({ error: "Failed to improve sentence." });
+    }
+});
+
 
 // ✅ **Start the Server**
 app.listen(PORT, () => {

@@ -75,7 +75,7 @@ app.post("/generate", async (req, res) => {
     }
 
     try {
-        let prompt = `Write an essay in ${language} on the topic: ${topic}. The essay should be ${length} words long.`;
+        let prompt = `Write a high quality essay in ${language} on the topic: ${topic}. The essay should be ${length} words long.`;
 
         if (note) {
             prompt += ` Additional note: ${note}`;

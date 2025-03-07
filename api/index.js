@@ -18,6 +18,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 const ESSAYS_FILE = path.join(__dirname, "essays.json");
 
+app.use(express.static(path.join(__dirname, "public")));
 // ✅ **Load essays from JSON file (if exists)**
 let essays = [];
 if (fs.existsSync(ESSAYS_FILE)) {
@@ -43,6 +44,8 @@ function saveEssaysToFile() {
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
+
+
 
 // ✅ **Serve admin.html (Admin Dashboard)**
 app.get("/admin", (req, res) => {

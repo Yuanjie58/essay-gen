@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Essay Generator by Yuan Jie</title>
+    <link rel="icon" type="image/png" href="favicon.png?v=2" sizes="48x62" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -156,21 +157,16 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 10px;
             padding: 10px;
             background: #f4f4f4;
             border-radius: 8px;
-            width: 100%;
+            width: fit-content; /* Prevent full width stretching */
             justify-content: center;
         }
 
         #font-size-slider {
             width: 60%;
             accent-color: #007bff;
-        }
-
-        #font-size-label {
-            font-weight: bold;
         }
 
     </style>
@@ -206,7 +202,7 @@
         <h2>Generated Essay:</h2>
         <textarea id="output" onclick="handleSentenceSelection(event)" oninput="updateWordCount()"></textarea>
         <p><strong>Word Count:</strong> <span id="word-count">0</span></p>
-        <label for="font-size">Font Size:</label>
+        <h3 font-weight: bold;>Font Size:</h3>
         <div class="font-size-container">
             <label for="font-size-slider">Font Size:</label>
             <input type="range" id="font-size-slider" min="14" max="30" step="2" value="18" oninput="changeFontSize()">
@@ -215,11 +211,12 @@
 
 
     </div>
-
-    <div id="sentence-options">
+    <div id="sentence-options" style="display: none; position: absolute; background: white; padding: 5px;">
+        <button onclick="improveSentence()">Improve</button>
         <button onclick="deleteSentence()">Delete</button>
-        <button onclick="improveSentence()">Improve with AI</button>
     </div>
+
+
 
     <div id="history-modal" class="modal">
         <div class="modal-content">
@@ -228,11 +225,9 @@
             <ul id="history-list"></ul>
             <button onclick="clearHistory()">🗑 Clear All History</button>
         </div>
+        <audio id="livemylife-audio" src="aespa-Live_My_Life.mp3"></audio>
 
     <script>
-        let selectedSentence = "";
-        let selectionStart = 0;
-        let selectionEnd = 0;
 
         function getUserDeviceInfo() {
             const userAgent = navigator.userAgent;
@@ -374,83 +369,144 @@
             document.body.removeChild(a);
         }
 
-        function toggleFullscreen() {
-            const elem = document.getElementById("output");
-            if (!document.fullscreenElement) elem.requestFullscreen();
-            else document.exitFullscreen();
-        }
+        let selectedSentence = "";
+        let selectionStart = 0;
+        let selectionEnd = 0;
+
+        document.addEventListener("selectionchange", handleSentenceSelection);
+        document.addEventListener("mouseup", handleSentenceSelection);
+        document.addEventListener("touchend", handleSentenceSelection);
 
         function handleSentenceSelection(event) {
             const output = document.getElementById("output");
             const optionsMenu = document.getElementById("sentence-options");
+
+            if (!output || document.activeElement !== output) return; // Run only if textarea is focused
 
             selectionStart = output.selectionStart;
             selectionEnd = output.selectionEnd;
             selectedSentence = output.value.substring(selectionStart, selectionEnd).trim();
 
             if (selectedSentence) {
+                const rect = output.getBoundingClientRect();
+                const selectionY = getSelectionY(output);
+                const menuHeight = optionsMenu.offsetHeight || 50;
+                const menuWidth = optionsMenu.offsetWidth || 100;
+
+                let posX = event.pageX; // Set X to mouse/touch position
+                let posY = selectionY - menuHeight - 10; // Try placing menu above
+
+                // Prevent menu from overflowing off the right
+                if (posX + menuWidth > window.innerWidth) {
+                    posX = window.innerWidth - menuWidth - 10;
+                }
+
+                // Prevent menu from overflowing off the left
+                if (posX < 10) {
+                    posX = 10;
+                }
+
+                // If there's not enough space above, move menu below the selection
+                if (posY < 0) {
+                    posY = selectionY + 20;
+                }
+
+                optionsMenu.style.left = `${posX}px`;
+                optionsMenu.style.top = `${posY}px`;
                 optionsMenu.style.display = "block";
-                optionsMenu.style.left = `${event.pageX}px`;
-                optionsMenu.style.top = `${event.pageY}px`;
             } else {
                 optionsMenu.style.display = "none";
             }
         }
 
-        // Ensure menu hides when clicking outside
-        document.addEventListener("click", function(event) {
+        // Function to get the Y position of the selection
+        function getSelectionY(textarea) {
+            const rect = textarea.getBoundingClientRect();
+            const lineHeight = 20; // Approximate line height
+            const lines = textarea.value.substring(0, selectionStart).split("\n").length;
+            return rect.top + window.scrollY + lines * lineHeight;
+        }
+
+        // Hide menu when clicking outside
+        document.addEventListener("click", function (event) {
             if (!event.target.closest("#sentence-options") && !event.target.closest("#output")) {
                 document.getElementById("sentence-options").style.display = "none";
             }
         });
-
-
-
 
         function deleteSentence() {
             replaceSentence("");
         }
 
         async function improveSentence() {
-            const output = document.getElementById("output");
+            if (!selectedSentence) return;
+
             replaceSentence("[Improving...]");
+            updateWordCount(); // Update count immediately
+
             try {
                 const response = await fetch("/improveSentence", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ sentence: selectedSentence })
                 });
+
                 const data = await response.json();
                 if (data.improvedSentence) {
                     replaceSentence(data.improvedSentence);
+                    updateWordCount(); // ✅ Update count after improvement
                 } else {
                     alert("❌ AI improvement failed.");
+                    replaceSentence(selectedSentence); // Restore original text
+                    updateWordCount();
                 }
             } catch (error) {
                 alert("❌ Network error.");
+                replaceSentence(selectedSentence); // Restore original text
+                updateWordCount();
             }
         }
 
         function replaceSentence(newSentence) {
             const output = document.getElementById("output");
             const text = output.value;
+
             output.value = text.substring(0, selectionStart) + newSentence + text.substring(selectionEnd);
+
+            // Restore cursor position
+            output.setSelectionRange(selectionStart, selectionStart + newSentence.length);
+            output.focus();
         }
 
         function changeFontSize() {
-            const fontSize = document.getElementById("font-size-slider").value + "px";
-            document.getElementById("output").style.fontSize = fontSize;
-            document.getElementById("font-size-label").textContent = fontSize;
-            localStorage.setItem("essayFontSize", fontSize);
+            const slider = document.getElementById("font-size-slider");
+            const label = document.getElementById("font-size-label");
+            const output = document.getElementById("output"); // Ensure there's an element with id="output"
+
+            label.textContent = slider.value + "px";
+            if (output) {
+                output.style.fontSize = slider.value + "px";
+            }
         }
 
-        // ✅ Restore saved font size on page load
-        window.onload = function () {
-            const savedFontSize = localStorage.getItem("essayFontSize") || "18px";
-            document.getElementById("font-size-slider").value = parseInt(savedFontSize);
-            document.getElementById("font-size-label").textContent = savedFontSize;
-            document.getElementById("output").style.fontSize = savedFontSize;
-        };
+        let isPlaying = false;
+
+        document.addEventListener("keydown", function(event) {
+            if (event.key.toLowerCase() === "a") {
+                const audio = document.getElementById("livemylife-audio");
+
+                audio.volume = 0.5;
+
+                if (isPlaying) {
+                    audio.pause();
+                    audio.currentTime = 0; // Reset audio
+                } else {
+                    audio.play();
+                }
+
+                isPlaying = !isPlaying; // Toggle play/pause state
+            }
+        });
 
     </script>
 </body>

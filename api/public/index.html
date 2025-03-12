@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Essay Generator by Yuan Jie</title>
+    <title>Essay Generator by YUAN JIE | AI-Powered Writing</title>
+    <meta name="description" content="Generate high-quality essays in English, Chinese, and Malay instantly with our AI-powered essay generator. Perfect for students and professionals.">
+    <meta name="keywords" content="essay generator, AI essay writer, automatic writing tool, English essays, Chinese essays, Malay essays">
+    <meta name="author" content="YUAN JIE">
+    <meta property="og:title" content="Essay Generator by YUAN JIE">
+    <meta property="og:description" content="AI-powered essay generation tool to create high-quality essays instantly.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yuanjie.us.kg/">
+    <meta property="og:image" content="https://yuanjie.us.kg/favicon.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Essay Generator by YUAN JIE",
+      "url": "https://yuanjie.us.kg/",
+      "description": "Generate high-quality essays in multiple languages using AI.",
+      "author": {
+        "@type": "Person",
+        "name": "YUAN JIE"
+      }
+    }
+    </script>
     <link rel="icon" type="image/png" href="favicon.png?v=2" sizes="48x62" />
     <style>
         body {
@@ -174,7 +195,6 @@
 <body>
     <div class="container">
         <h1>Essay Generator by Yuan Jie</h1>
-
         <label for="topic">Topic:</label>
         <input type="text" id="topic" placeholder="Enter topic">
 
@@ -193,10 +213,10 @@
 
         <div class="button-group">
             <button id="generate-button" onclick="generateEssay()">🚀 Generate Essay</button>
-            <button onclick="copyText()">📋 Copy</button>
-            <button onclick="exportToWord()">📥 Export</button>
-            <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
-            <button onclick="showHistory()">📜 History</button>
+            <button id="copy-button" onclick="copyText()">📋 Copy</button>
+            <button id="export-button onclick="exportToWord()">📥 Export</button>
+            <button id="fullscreen-button" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+            <button id="history-button" onclick="showHistory()">📜 History</button>
         </div>
 
         <h2>Generated Essay:</h2>

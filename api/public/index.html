@@ -244,9 +244,7 @@
             <ul id="history-list"></ul>
             <button onclick="clearHistory()">🗑 Clear All History</button>
         </div>
-        <audio id="livemylife-audio" src="aespa-Live_My_Life.mp3"></audio>
-
-    
+        
     <script>
         const translations = {
             English: {
@@ -586,26 +584,6 @@
                 output.style.fontSize = slider.value + "px";
             }
         }
-
-
-        let isPlaying = false;
-
-        document.addEventListener("keydown", function(event) {
-            if (event.key.toLowerCase() === "a") {
-                const audio = document.getElementById("livemylife-audio");
-
-                audio.volume = 0.5;
-
-                if (isPlaying) {
-                    audio.pause();
-                    audio.currentTime = 0; // Reset audio
-                } else {
-                    audio.play();
-                }
-
-                isPlaying = !isPlaying; // Toggle play/pause state
-            }
-        });
 
     </script>
 </body>

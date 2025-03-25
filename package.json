@@ -2,21 +2,24 @@
 	"name": "express",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.ts",
+	"main": "api/index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"start": "node api/index.ts"
+		"start": "node api/index.js"
 	},
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@google/generative-ai": "^0.22.0",
-    "@types/node": "^18.0.6",
-    "axios": "^1.7.9",
-    "body-parser": "^1.20.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2"
-  }
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@google/generative-ai": "^0.22.0",
+		"@types/node": "^18.0.6",
+		"axios": "^1.7.9",
+		"body-parser": "^1.20.3",
+		"cors": "^2.8.5",
+		"docx": "^9.3.0",
+		"dotenv": "^16.4.7",
+		"express": "^4.21.2",
+		"file-saver": "^2.0.5",
+		"mongoose": "^8.13.0"
+	}
 }

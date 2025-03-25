@@ -194,40 +194,39 @@
 </head>
 <body>
     <div class="container">
-        <h1>Essay Generator by Yuan Jie</h1>
-        <label for="topic">Topic:</label>
+        <h1 id="title">Essay Generator by Yuan Jie</h1>
+
+        <label id="topic-label" for="topic">Topic:</label>
         <input type="text" id="topic" placeholder="Enter topic">
 
-        <label for="language">Language:</label>
-        <select id="language">
+        <label id="language-label" for="language">Language:</label>
+        <select id="language" onchange="changeLanguage()">
             <option value="English">English</option>
             <option value="Chinese">Chinese</option>
             <option value="Malay">Malay</option>
         </select>
 
-        <label for="length">Word Count:</label>
+        <label id="length-label" for="length">Word Count:</label>
         <input type="number" id="length" placeholder="Enter word count">
 
-        <label for="note">Additional Note:</label>
+        <label id="note-label" for="note">Additional Note:</label>
         <textarea id="note" placeholder="Enter additional note (optional)"></textarea>
 
-        <div class="button-group">
-            <button id="generate-button" onclick="generateEssay()">🚀 Generate Essay</button>
-            <button id="copy-button" onclick="copyText()">📋 Copy</button>
-            <button id="export-button" onclick="exporttoword()">📥 Export</button>
-            <button id="fullscreen-button" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-            <button id="history-button" onclick="showHistory()">📜 History</button>
+        <button id="generate-button" onclick="generateEssay()">🚀 Generate Essay</button>
+        <button id="copy-button" onclick="copyText()">📋 Copy</button>
+        <button id="export-button" onclick="exporttoword()">📥 Export to DOCX</button>
+        <button id="fullscreen-button" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        <button id="history-button" onclick="showHistory()">📜 History</button>
+
+        <h2 id="generated-essay-label">Generated Essay:</h2>
+        <textarea id="output" onclick="handleSentenceSelection(event)" oninput="updateWordCount()"></textarea>
+        <p><strong id="word-count-label">Word Count:</strong> <span id="word-count">0</span></p>
+        <h3 id="font-size-label" style="font-weight: bold;">Font Size:</h3>
+        <div class="font-size-container">
+            <input type="range" id="font-size-slider" min="14" max="36" step="2" value="18" oninput="changeFontSize()">
+            <span id="font-size-value">36px</span>
         </div>
 
-        <h2>Generated Essay:</h2>
-        <textarea id="output" onclick="handleSentenceSelection(event)" oninput="updateWordCount()"></textarea>
-        <p><strong>Word Count:</strong> <span id="word-count">0</span></p>
-        <h3 font-weight: bold;>Font Size:</h3>
-        <div class="font-size-container">
-            <label for="font-size-slider">Font Size:</label>
-            <input type="range" id="font-size-slider" min="14" max="30" step="2" value="18" oninput="changeFontSize()">
-            <span id="font-size-label">18px</span>
-        </div>
 
 
     </div>
@@ -247,7 +246,76 @@
         </div>
         <audio id="livemylife-audio" src="aespa-Live_My_Life.mp3"></audio>
 
+    
     <script>
+        const translations = {
+            English: {
+                title: "Essay Generator by Yuan Jie",
+                topicLabel: "Topic:",
+                languageLabel: "Language:",
+                lengthLabel: "Word Count:",
+                noteLabel: "Additional Note:",
+                generateButton: "🚀 Generate Essay",
+                copyButton: "📋 Copy",
+                exportButton: "📥 Export to DOCX",
+                fullscreenButton: "⛶ Fullscreen",
+                historyButton: "📜 History",
+                generatedEssay: "Generated Essay:",
+                wordCount: "Word Count:",
+                fontSize: "Font Size:"
+            },
+            Chinese: {
+                title: "原捷的文章生成器",
+                topicLabel: "主题：",
+                languageLabel: "语言：",
+                lengthLabel: "字数：",
+                noteLabel: "附加说明：",
+                generateButton: "🚀 生成文章",
+                copyButton: "📋 复制",
+                exportButton: "📥 导出为DOCX",
+                fullscreenButton: "⛶ 全屏",
+                historyButton: "📜 历史记录",
+                generatedEssay: "生成的文章：",
+                wordCount: "字数：",
+                fontSize: "字体大小："
+            },
+            Malay: {
+                title: "Penjana Karangan oleh Yuan Jie",
+                topicLabel: "Topik:",
+                languageLabel: "Bahasa:",
+                lengthLabel: "Bilangan Perkataan:",
+                noteLabel: "Nota Tambahan:",
+                generateButton: "🚀 Jana Karangan",
+                copyButton: "📋 Salin",
+                exportButton: "📥 Eksport ke DOCX",
+                fullscreenButton: "⛶ Skrin Penuh",
+                historyButton: "📜 Sejarah",
+                generatedEssay: "Karangan Dihasilkan:",
+                wordCount: "Bilangan Perkataan:",
+                fontSize: "Saiz Fon:"
+            }
+        };
+
+
+        function changeLanguage() {
+            const selectedLang = document.getElementById("language").value;
+            const t = translations[selectedLang];
+
+            document.title = t.title;
+            document.getElementById("topic-label").textContent = t.topicLabel;
+            document.getElementById("language-label").textContent = t.languageLabel;
+            document.getElementById("length-label").textContent = t.lengthLabel;
+            document.getElementById("note-label").textContent = t.noteLabel;
+            document.getElementById("generate-button").textContent = t.generateButton;
+            document.getElementById("copy-button").textContent = t.copyButton;
+            document.getElementById("export-button").textContent = t.exportButton;
+            document.getElementById("fullscreen-button").textContent = t.fullscreenButton;
+            document.getElementById("history-button").textContent = t.historyButton;
+            document.getElementById("generated-essay-label").textContent = t.generatedEssay;
+            document.getElementById("word-count-label").textContent = t.wordCount;
+            document.getElementById("font-size-label").textContent = t.fontSize; // ✅ Font Size Label
+        }
+
 
         function getUserDeviceInfo() {
             const userAgent = navigator.userAgent;
@@ -374,26 +442,30 @@
                 .catch(() => alert("Failed to copy text."));
         }
 
-        function exporttoword() {
-            const output = document.getElementById("output").value.trim();
-            const topic = document.getElementById("topic").value.trim() || "essay";
-            if (!output) return alert("No essay to export!");
-
-            const fileName = topic.replace(/\s+/g, "_") + ".doc";
-            const blob = new Blob(["\ufeff" + output], { type: "application/msword" });
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
          function toggleFullscreen() {
              const elem = document.getElementById("output");
              if (!document.fullscreenElement) elem.requestFullscreen();
              else document.exitFullscreen();
          }
+
+            async function exportEssay() {
+                const response = await fetch("/getEssays");
+                const essays = await response.json();
+
+                if (essays.length === 0) {
+                    return alert("⚠ No essays available for export!");
+                }
+
+                const essayId = essays[0]._id; // Change this to select the correct essay
+                const downloadUrl = `/export-docx/${essayId}`;
+
+                const link = document.createElement("a");
+                link.href = downloadUrl;
+                link.download = "exported_essay.docx";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
 
         let selectedSentence = "";
         let selectionStart = 0;
@@ -507,13 +579,14 @@
         function changeFontSize() {
             const slider = document.getElementById("font-size-slider");
             const label = document.getElementById("font-size-label");
-            const output = document.getElementById("output"); // Ensure there's an element with id="output"
+            const output = document.getElementById("output"); // Ensure the essay output has this ID
 
             label.textContent = slider.value + "px";
             if (output) {
                 output.style.fontSize = slider.value + "px";
             }
         }
+
 
         let isPlaying = false;
 

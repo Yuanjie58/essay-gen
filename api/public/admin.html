@@ -83,42 +83,50 @@
                 const response = await fetch("/getEssays");
                 const essays = await response.json();
                 const list = document.getElementById("essay-list");
+
                 list.innerHTML = essays.map((e, index) => `
                     <tr>
                         <td>${e.topic}</td>
                         <td>${e.language}</td>
                         <td>${e.wordCount}</td>
-                        <td>${e.timestamp}</td>
+                        <td>${new Date(e.timestamp).toLocaleString()}</td>
                         <td>${e.device}</td>
                         <td>${e.browser}</td>
                         <td>${e.os}</td>
                         <td>
-                            <button onclick="viewFullEssay(${index})">📖 View Full Essay</button>
+                            <button onclick="viewFullEssay(${index})">📖 View</button>
+                            <button onclick="deleteEssay('${e._id}')">🗑 Delete</button>
                         </td>
                     </tr>
                 `).join("");
             } catch (error) {
-                console.error("Error fetching essays:", error);
+                console.error("❌ Error fetching essays:", error);
             }
         }
 
-        function viewFullEssay(index) {
-            fetch("/getEssays")
-                .then(response => response.json())
-                .then(essays => {
-                    const essay = essays[index];
-                    document.getElementById("modal-title").textContent = essay.topic;
-                    document.getElementById("modal-content").textContent = essay.essay;
-                    document.getElementById("essay-modal").style.display = "flex";
+        async function deleteEssay(id) {
+            if (!confirm("Are you sure you want to delete this essay?")) return;
+
+            try {
+                const response = await fetch(`/deleteEssay/${id}`, {
+                    method: "DELETE",
                 });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert("✅ Essay deleted successfully!");
+                    fetchEssays(); // Refresh the essay list
+                } else {
+                    alert("❌ Error deleting essay: " + result.error);
+                }
+            } catch (error) {
+                alert("❌ Network error. Try again.");
+            }
         }
 
-        function closeModal() {
-            document.getElementById("essay-modal").style.display = "none";
-        }
-
-        setInterval(fetchEssays, 5000);
+        setInterval(fetchEssays, 5000); // Auto-refresh every 5 seconds
         fetchEssays();
     </script>
+
 </body>
 </html>

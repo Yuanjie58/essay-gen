@@ -374,7 +374,7 @@
                 .catch(() => alert("Failed to copy text."));
         }
 
-        function exportToWord() {
+        function exporttoword() {
             const output = document.getElementById("output").value.trim();
             const topic = document.getElementById("topic").value.trim() || "essay";
             if (!output) return alert("No essay to export!");
@@ -388,6 +388,12 @@
             a.click();
             document.body.removeChild(a);
         }
+
+         function toggleFullscreen() {
+             const elem = document.getElementById("output");
+             if (!document.fullscreenElement) elem.requestFullscreen();
+             else document.exitFullscreen();
+         }
 
         let selectedSentence = "";
         let selectionStart = 0;

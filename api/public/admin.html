@@ -99,7 +99,8 @@
                         <td>${e.topic}</td>
                         <td>${e.language}</td>
                         <td>${e.wordCount}</td>
-                        <td>${new Date(e.timestamp).toLocaleString()}</td>
+                        <td>${new Date(e.timestamp).toLocaleString("en-US", { timeZone: "Asia/Kuala_Lumpur" })}</td>
+
                         <td>${e.device}</td>
                         <td>${e.browser}</td>
                         <td>${e.os}</td>

@@ -47,6 +47,17 @@
             font-size: 24px;
             cursor: pointer;
         }
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-btn:hover {
+            background: darkred;
+        }
     </style>
 </head>
 <body>
@@ -67,7 +78,7 @@
         </thead>
         <tbody id="essay-list"></tbody>
     </table>
-    
+
     <!-- Modal for viewing full essay -->
     <div id="essay-modal" class="modal">
         <div class="modal-content">
@@ -83,7 +94,6 @@
                 const response = await fetch("/getEssays");
                 const essays = await response.json();
                 const list = document.getElementById("essay-list");
-
                 list.innerHTML = essays.map((e, index) => `
                     <tr>
                         <td>${e.topic}</td>
@@ -95,13 +105,37 @@
                         <td>${e.os}</td>
                         <td>
                             <button onclick="viewFullEssay(${index})">📖 View</button>
-                            <button onclick="deleteEssay('${e._id}')">🗑 Delete</button>
+                            <button class="delete-btn" onclick="deleteEssay('${e._id}')">🗑 Delete</button>
                         </td>
                     </tr>
                 `).join("");
             } catch (error) {
-                console.error("❌ Error fetching essays:", error);
+                console.error("Error fetching essays:", error);
             }
+        }
+
+        function viewFullEssay(index) {
+            fetch("/getEssays")
+                .then(response => response.json())
+                .then(essays => {
+                    const essay = essays[index];
+                    if (!essay) {
+                        alert("⚠ Essay not found!");
+                        return;
+                    }
+
+                    document.getElementById("modal-title").textContent = essay.topic;
+                    document.getElementById("modal-content").textContent = essay.essay;
+                    document.getElementById("essay-modal").style.display = "flex";
+                })
+                .catch(error => {
+                    console.error("❌ Error fetching essay:", error);
+                    alert("❌ Failed to load essay.");
+                });
+        }
+
+        function closeModal() {
+            document.getElementById("essay-modal").style.display = "none";
         }
 
         async function deleteEssay(id) {
@@ -127,6 +161,5 @@
         setInterval(fetchEssays, 5000); // Auto-refresh every 5 seconds
         fetchEssays();
     </script>
-
 </body>
 </html>

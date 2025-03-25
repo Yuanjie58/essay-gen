@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const { Document, Packer, Paragraph, TextRun } = require("docx");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
+const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -78,6 +79,16 @@ app.post("/admin-login", (req, res) => {
 });
 
 // ✅ **Generate Essay & Save to JSON File**
+async function getMalaysiaTime() {
+    try {
+        const response = await axios.get("http://worldtimeapi.org/api/timezone/Asia/Kuala_Lumpur");
+        return new Date(response.data.datetime);
+    } catch (error) {
+        console.error("❌ Error fetching time from server:", error);
+        return new Date(); // Default to system time if API fails
+    }
+}
+
 app.post("/generate", async (req, res) => {
     const { topic, language, length, note, device, browser, os } = req.body;
 
@@ -96,16 +107,15 @@ app.post("/generate", async (req, res) => {
         const text = result.response.candidates?.[0]?.content?.parts?.[0]?.text || "Error: No response from AI.";
         const wordCount = text.match(/[\u00ff-\uffff]|\S+/g)?.length || 0;
 
-        // Convert to Malaysia Time (UTC+8)
-        const now = new Date();
-        now.setHours(now.getHours() + 8);
+        // ✅ Fetch Malaysia Time from the time server
+        const malaysiaTime = await getMalaysiaTime();
 
         const newEssay = new Essay({
             topic,
             language,
             length,
             wordCount,
-            timestamp: now, // ✅ Save in UTC+8 Malaysia Time
+            timestamp: malaysiaTime, // ✅ Save time from the time server
             essay: text,
             device: device || "Unknown",
             browser: browser || "Unknown",

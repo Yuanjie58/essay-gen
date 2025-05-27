@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essay Generator Demo - Enhanced UI</title>
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #4ade80;
+            --warning-color: #fbbf24;
+            --danger-color: #f87171;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--gray-800);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .demo-notice {
+            background: linear-gradient(135deg, var(--warning-color), #f59e0b);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            height: 200px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        #generate-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-size: 18px;
+            padding: 18px 32px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(0);
+        }
+
+        #generate-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .secondary-button {
+            background: white;
+            color: var(--gray-600);
+            border: 2px solid var(--gray-200);
+        }
+
+        .secondary-button:hover {
+            background: var(--gray-100);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .output-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--gray-200);
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .word-count-badge {
+            background: linear-gradient(135deg, var(--success-color), #22c55e);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .font-size-container {
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 1rem 0;
+        }
+
+        .font-size-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .font-size-label {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .font-size-value {
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .font-size-presets {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .font-preset-btn {
+            background: white;
+            border: 2px solid var(--gray-200);
+            color: var(--gray-600);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .font-preset-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .font-preset-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .font-size-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .font-size-btn {
+            background: white;
+            border: 2px solid var(--gray-200);
+            color: var(--gray-600);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .font-size-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        #font-size-slider {
+            flex: 1;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(to right, var(--gray-300) 0%, var(--gray-300) 100%);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #font-size-slider::-webkit-slider-track {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(to right, var(--gray-300) 0%, var(--gray-300) 100%);
+        }
+
+        #font-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            position: relative;
+        }
+
+        #font-size-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        #font-size-slider::-webkit-slider-thumb:active {
+            transform: scale(1.05);
+        }
+
+        #font-size-slider::-moz-range-track {
+            height: 12px;
+            border-radius: 6px;
+            background: var(--gray-300);
+            border: none;
+        }
+
+        #font-size-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #font-size-slider::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Custom progress fill effect */
+        #font-size-slider {
+            background: linear-gradient(to right, 
+                var(--primary-color) 0%, 
+                var(--primary-color) var(--slider-progress, 25%), 
+                var(--gray-300) var(--slider-progress, 25%), 
+                var(--gray-300) 100%);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-description {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced Essay Generator</h1>
+        
+        <div class="demo-notice">
+            🎨 This is a demo showcasing the enhanced UI design. The backend functionality requires API keys to work.
+        </div>
+
+        <div class="form-group">
+            <label for="topic">Topic:</label>
+            <input type="text" id="topic" placeholder="Enter your essay topic..." value="The Impact of Technology on Education">
+        </div>
+
+        <div class="form-group">
+            <label for="language">Language:</label>
+            <select id="language">
+                <option value="English">English</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Malay">Malay</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="length">Word Count:</label>
+            <input type="number" id="length" placeholder="Enter desired word count..." min="50" max="5000" value="500">
+        </div>
+
+        <div class="form-group">
+            <label for="note">Additional Note:</label>
+            <textarea id="note" placeholder="Enter any additional instructions or requirements (optional)...">Focus on both positive and negative impacts, include real-world examples.</textarea>
+        </div>
+
+        <div class="button-container">
+            <button id="generate-button" onclick="demoGenerate()">🚀 Generate Essay</button>
+            
+            <div class="button-group">
+                <button class="secondary-button" onclick="demoCopy()">📋 Copy</button>
+                <button class="secondary-button" onclick="demoExport()">📥 Export to DOCX</button>
+                <button class="secondary-button" onclick="demoFullscreen()">⛶ Fullscreen</button>
+                <button class="secondary-button" onclick="demoHistory()">📜 History</button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="output-header">
+                <h2>Generated Essay:</h2>
+                <div class="word-count-badge">
+                    Word Count: <span id="word-count">487</span>
+                </div>
+            </div>
+            
+            <textarea id="output" placeholder="Your generated essay will appear here...">The Impact of Technology on Education
+
+Technology has fundamentally transformed the landscape of education, bringing both revolutionary opportunities and significant challenges. This transformation has accelerated dramatically in recent years, particularly following the global shift to remote learning during the COVID-19 pandemic.
+
+Positive Impacts:
+
+Enhanced Accessibility: Technology has democratized education by making learning resources available to students regardless of their geographical location. Online platforms like Khan Academy, Coursera, and edX provide high-quality educational content to millions of learners worldwide. Students in remote areas can now access the same quality of education as those in urban centers.
+
+Personalized Learning: Adaptive learning technologies use artificial intelligence to customize educational experiences based on individual student needs, learning pace, and preferences. This personalization helps students learn more effectively and efficiently.
+
+Interactive Learning: Digital tools have made learning more engaging through interactive simulations, virtual reality experiences, and gamification. These technologies help students visualize complex concepts and maintain higher levels of engagement.
+
+Negative Impacts:
+
+Digital Divide: Not all students have equal access to technology and reliable internet connections, creating disparities in educational opportunities. This digital divide can exacerbate existing inequalities in education.
+
+Reduced Human Interaction: Over-reliance on technology can diminish face-to-face interactions between teachers and students, potentially affecting social skills development and emotional learning.
+
+Distraction and Dependency: The constant availability of digital devices can lead to decreased attention spans and over-dependence on technology for learning and problem-solving.
+
+Conclusion:
+
+While technology has undoubtedly enhanced educational opportunities and methodologies, it is crucial to implement it thoughtfully and equitably. The key lies in finding the right balance between technological innovation and traditional educational values, ensuring that technology serves as a tool to enhance human potential rather than replace human connection in the learning process.</textarea>
+            
+            <div class="font-size-container">
+                <div class="font-size-header">
+                    <label class="font-size-label">Font Size:</label>
+                    <span id="font-size-value" class="font-size-value">18px</span>
+                </div>
+                
+                <div class="font-size-presets">
+                    <button class="font-preset-btn" onclick="setFontSize(14)">Small</button>
+                    <button class="font-preset-btn active" onclick="setFontSize(18)">Medium</button>
+                    <button class="font-preset-btn" onclick="setFontSize(22)">Large</button>
+                    <button class="font-preset-btn" onclick="setFontSize(28)">X-Large</button>
+                </div>
+                
+                <div class="font-size-slider-container">
+                    <button class="font-size-btn" onclick="decreaseFontSize()" title="Decrease font size">−</button>
+                    <input type="range" id="font-size-slider" min="12" max="36" step="1" value="18" oninput="changeFontSize()">
+                    <button class="font-size-btn" onclick="increaseFontSize()" title="Increase font size">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">Modern Design</div>
+                <div class="feature-description">Beautiful gradient backgrounds, glassmorphism effects, and smooth animations</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <div class="feature-title">Responsive Layout</div>
+                <div class="feature-description">Optimized for all devices - desktop, tablet, and mobile</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Enhanced UX</div>
+                <div class="feature-description">Loading states, notifications, and improved user feedback</div>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-title">Multi-language</div>
+                <div class="feature-description">Support for English, Chinese, and Malay languages</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function demoGenerate() {
+            alert('🎨 This is a UI demo! The actual generation requires API keys to be configured.');
+        }
+
+        function demoCopy() {
+            const output = document.getElementById("output");
+            navigator.clipboard.writeText(output.value)
+                .then(() => alert("📋 Demo text copied to clipboard!"))
+                .catch(() => alert("Failed to copy text."));
+        }
+
+        function demoExport() {
+            alert('📥 Export functionality demonstrated! In the real app, this would download a DOCX file.');
+        }
+
+        function demoFullscreen() {
+            const elem = document.getElementById("output");
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function demoHistory() {
+            alert('📜 History feature demonstrated! In the real app, this would show your essay history.');
+        }
+
+        function changeFontSize() {
+            const slider = document.getElementById("font-size-slider");
+            const valueDisplay = document.getElementById("font-size-value");
+            const output = document.getElementById("output");
+
+            valueDisplay.textContent = slider.value + "px";
+            if (output) {
+                output.style.fontSize = slider.value + "px";
+            }
+            
+            // Update slider progress fill
+            updateSliderProgress(slider);
+            
+            // Update preset button states
+            updatePresetButtons(parseInt(slider.value));
+        }
+
+        function updateSliderProgress(slider) {
+            const min = slider.min || 12;
+            const max = slider.max || 36;
+            const value = slider.value;
+            const progress = ((value - min) / (max - min)) * 100;
+            
+            slider.style.setProperty('--slider-progress', progress + '%');
+        }
+
+        function setFontSize(size) {
+            const slider = document.getElementById("font-size-slider");
+            const valueDisplay = document.getElementById("font-size-value");
+            const output = document.getElementById("output");
+
+            slider.value = size;
+            valueDisplay.textContent = size + "px";
+            if (output) {
+                output.style.fontSize = size + "px";
+            }
+            
+            // Update slider progress fill
+            updateSliderProgress(slider);
+            
+            // Update preset button states
+            updatePresetButtons(size);
+        }
+
+        function increaseFontSize() {
+            const slider = document.getElementById("font-size-slider");
+            const currentSize = parseInt(slider.value);
+            const newSize = Math.min(36, currentSize + 2);
+            setFontSize(newSize);
+        }
+
+        function decreaseFontSize() {
+            const slider = document.getElementById("font-size-slider");
+            const currentSize = parseInt(slider.value);
+            const newSize = Math.max(12, currentSize - 2);
+            setFontSize(newSize);
+        }
+
+        function updatePresetButtons(currentSize) {
+            const presetButtons = document.querySelectorAll('.font-preset-btn');
+            const presetSizes = [14, 18, 22, 28];
+            
+            presetButtons.forEach((button, index) => {
+                button.classList.remove('active');
+                if (presetSizes[index] === currentSize) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
+        // Initialize font size on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            changeFontSize();
+        });
+    </script>
+</body>
+</html>

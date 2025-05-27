@@ -5,75 +5,302 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
     <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --danger-color: #f87171;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            height: 100vh; 
-            background-color: #f4f4f9;
+            min-height: 100vh; 
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px;
         }
-        .login-box { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-            text-align: center; 
-            width: 300px;
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        input, button { 
-            width: 100%; 
-            padding: 10px; 
-            margin: 10px 0; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
-            box-sizing: border-box;
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+
+        .login-header {
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
             font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
         }
-        button { 
-            background: #007bff; 
-            color: white; 
-            font-weight: bold; 
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
         }
-        button:hover { background: #0056b3; }
-        #error-msg { 
-            color: red; 
-            font-size: 14px; 
-            margin-top: 5px;
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-box">
-        <h2>Admin Login</h2>
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button onclick="login()">Login</button>
-        <p id="error-msg"></p>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-icon">🔐</div>
+            <h2>Admin Login</h2>
+            <p class="login-subtitle">Access the admin dashboard</p>
+        </div>
+
+        <form onsubmit="login(event)">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" id="login-btn">
+                🚀 Login to Dashboard
+            </button>
+        </form>
+
+        <div class="error-message" id="error-msg"></div>
     </div>
 
     <script>
-        async function login() {
+        async function login(event) {
+            event.preventDefault();
+            
             const username = document.getElementById("username").value.trim();
             const password = document.getElementById("password").value.trim();
+            const loginBtn = document.getElementById("login-btn");
+            const errorMsg = document.getElementById("error-msg");
 
-            const response = await fetch("/admin-login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password })
-            });
+            // Reset error message
+            errorMsg.style.display = "none";
+            errorMsg.textContent = "";
 
-            const data = await response.json();
+            // Show loading state
+            loginBtn.disabled = true;
+            loginBtn.classList.add("loading");
+            loginBtn.textContent = "";
 
-            if (response.ok) {
-                localStorage.setItem("adminLoggedIn", "true");
-                window.location.href = "admin.html"; // Redirect to admin page
-            } else {
-                document.getElementById("error-msg").textContent = data.message;
+            try {
+                const response = await fetch("/admin-login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem("adminLoggedIn", "true");
+                    loginBtn.textContent = "✅ Success! Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = "admin.html";
+                    }, 1000);
+                } else {
+                    throw new Error(data.message || "Login failed");
+                }
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorMsg.style.display = "block";
+                
+                // Reset button
+                loginBtn.disabled = false;
+                loginBtn.classList.remove("loading");
+                loginBtn.textContent = "🚀 Login to Dashboard";
             }
         }
+
+        // Allow Enter key to submit form
+        document.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                login(event);
+            }
+        });
+
+        // Auto-focus username field
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("username").focus();
+        });
     </script>
 </body>
 </html>

@@ -27,106 +27,429 @@
     </script>
     <link rel="icon" type="image/png" href="favicon.png?v=2" sizes="48x62" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-        }
-        h1 {
-            text-align: center;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-        }
-        input, select, textarea, button {
-            width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        textarea {
-            height: 150px;
-            resize: none;
-        }
-        button {
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --success-color: #4ade80;
+            --warning-color: #fbbf24;
+            --danger-color: #f87171;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
         }
 
-        button:hover {
-            background-color: #D3D3D3;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--gray-800);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--gray-800);
+            font-size: 0.95rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            height: 200px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
         #generate-button {
-            background-color: #007bff;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
             font-size: 18px;
-            padding: 14px;
-            width: 100%;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
-            transition: background 0.3s, transform 0.2s;
+            padding: 18px 32px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(0);
         }
+
         #generate-button:hover {
-            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        #generate-button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-button {
+            background: white;
+            color: var(--gray-600);
+            border: 2px solid var(--gray-200);
+        }
+
+        .secondary-button:hover {
+            background: var(--gray-100);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .output-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--gray-200);
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .word-count-badge {
+            background: linear-gradient(135deg, var(--success-color), #22c55e);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .font-size-container {
+            background: var(--gray-100);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 1rem 0;
+        }
+
+        .font-size-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .font-size-label {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .font-size-value {
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .font-size-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .font-size-presets {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .font-preset-btn {
+            background: white;
+            border: 2px solid var(--gray-200);
+            color: var(--gray-600);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .font-preset-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .font-preset-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .font-size-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .font-size-btn {
+            background: white;
+            border: 2px solid var(--gray-200);
+            color: var(--gray-600);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .font-size-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .font-size-btn:active {
+            transform: translateY(0);
+        }
+
+        #font-size-slider {
+            flex: 1;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(to right, var(--gray-300) 0%, var(--gray-300) 100%);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #font-size-slider::-webkit-slider-track {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(to right, var(--gray-300) 0%, var(--gray-300) 100%);
+        }
+
+        #font-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            border: 3px solid white;
+            position: relative;
+        }
+
+        #font-size-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        #font-size-slider::-webkit-slider-thumb:active {
             transform: scale(1.05);
         }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
-            flex-wrap: wrap;
+
+        #font-size-slider::-moz-range-track {
+            height: 12px;
+            border-radius: 6px;
+            background: var(--gray-300);
+            border: none;
+        }
+
+        #font-size-slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #font-size-slider::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Custom progress fill effect */
+        #font-size-slider {
+            background: linear-gradient(to right, 
+                var(--primary-color) 0%, 
+                var(--primary-color) var(--slider-progress, 25%), 
+                var(--gray-300) var(--slider-progress, 25%), 
+                var(--gray-300) 100%);
         }
 
         #sentence-options {
             display: none;
             position: absolute;
             background: white;
-            padding: 8px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-xl);
             z-index: 1000;
-            font-size: 14px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--gray-200);
+            min-width: 120px;
         }
+
         #sentence-options button {
-            background-color: #007bff;
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 6px 12px;
-            margin: 3px 0;
-            border-radius: 3px;
+            padding: 8px 16px;
+            margin: 4px 0;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+            transition: all 0.2s ease;
         }
+
         #sentence-options button:hover {
-            background-color: #0056b3;
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
         .modal {
@@ -137,57 +460,182 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            animation: fadeIn 0.3s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .modal-content {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 30px;
+            border-radius: var(--border-radius-lg);
             width: 90%;
-            max-width: 500px;
-            text-align: center;
+            max-width: 600px;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s ease;
         }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         .close {
             float: right;
-            font-size: 24px;
+            font-size: 28px;
+            font-weight: bold;
             cursor: pointer;
+            color: var(--gray-600);
+            transition: color 0.2s ease;
         }
+
+        .close:hover {
+            color: var(--danger-color);
+        }
+
         #history-list {
             list-style: none;
             padding: 0;
             max-height: 60vh;
             overflow-y: auto;
         }
+
         #history-list li {
-            background: #f4f4f4;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
+            background: var(--gray-100);
+            padding: 16px;
+            margin: 8px 0;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
             cursor: pointer;
-            transition: background 0.3s;
-        }
-        #history-list li:hover {
-            background: #ddd;
-        }
-        .font-size-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: #f4f4f4;
-            border-radius: 8px;
-            width: fit-content; /* Prevent full width stretching */
-            justify-content: center;
         }
 
-        #font-size-slider {
-            width: 60%;
-            accent-color: #007bff;
+        #history-list li:hover {
+            background: var(--gray-200);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        #history-list button {
+            font-size: 12px;
+            padding: 6px 12px;
+            margin: 4px 4px 0 0;
+        }
+
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            input, select, textarea, button {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --gray-800: #f1f5f9;
+                --gray-600: #cbd5e1;
+                --gray-200: #334155;
+                --gray-100: #1e293b;
+                --light-color: #0f172a;
+            }
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus indicators for keyboard navigation */
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
 
     </style>
@@ -196,39 +644,71 @@
     <div class="container">
         <h1 id="title">Essay Generator by Yuan Jie</h1>
 
-        <label id="topic-label" for="topic">Topic:</label>
-        <input type="text" id="topic" placeholder="Enter topic">
-
-        <label id="language-label" for="language">Language:</label>
-        <select id="language" onchange="changeLanguage()">
-            <option value="English">English</option>
-            <option value="Chinese">Chinese</option>
-            <option value="Malay">Malay</option>
-        </select>
-
-        <label id="length-label" for="length">Word Count:</label>
-        <input type="number" id="length" placeholder="Enter word count">
-
-        <label id="note-label" for="note">Additional Note:</label>
-        <textarea id="note" placeholder="Enter additional note (optional)"></textarea>
-
-        <button id="generate-button" onclick="generateEssay()">🚀 Generate Essay</button>
-        <button id="copy-button" onclick="copyText()">📋 Copy</button>
-        <button id="export-button" onclick="exporttoword()">📥 Export to DOCX</button>
-        <button id="fullscreen-button" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-        <button id="history-button" onclick="showHistory()">📜 History</button>
-
-        <h2 id="generated-essay-label">Generated Essay:</h2>
-        <textarea id="output" onclick="handleSentenceSelection(event)" oninput="updateWordCount()"></textarea>
-        <p><strong id="word-count-label">Word Count:</strong> <span id="word-count">0</span></p>
-        <h3 id="font-size-label" style="font-weight: bold;">Font Size:</h3>
-        <div class="font-size-container">
-            <input type="range" id="font-size-slider" min="14" max="36" step="2" value="18" oninput="changeFontSize()">
-            <span id="font-size-value">36px</span>
+        <div class="form-group">
+            <label id="topic-label" for="topic">Topic:</label>
+            <input type="text" id="topic" placeholder="Enter your essay topic...">
         </div>
 
+        <div class="form-group">
+            <label id="language-label" for="language">Language:</label>
+            <select id="language" onchange="changeLanguage()">
+                <option value="English">English</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Malay">Malay</option>
+            </select>
+        </div>
 
+        <div class="form-group">
+            <label id="length-label" for="length">Word Count:</label>
+            <input type="number" id="length" placeholder="Enter desired word count..." min="50" max="5000">
+        </div>
 
+        <div class="form-group">
+            <label id="note-label" for="note">Additional Note:</label>
+            <textarea id="note" placeholder="Enter any additional instructions or requirements (optional)..."></textarea>
+        </div>
+
+        <div class="button-container">
+            <button id="generate-button" onclick="generateEssay()">🚀 Generate Essay</button>
+            
+            <div class="button-group">
+                <button class="secondary-button" id="copy-button" onclick="copyText()">📋 Copy</button>
+                <button class="secondary-button" id="export-button" onclick="exporttoword()">📥 Export to DOCX</button>
+                <button class="secondary-button" id="fullscreen-button" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+                <button class="secondary-button" id="history-button" onclick="showHistory()">📜 History</button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="output-header">
+                <h2 id="generated-essay-label">Generated Essay:</h2>
+                <div class="word-count-badge">
+                    <span id="word-count-label">Word Count:</span> <span id="word-count">0</span>
+                </div>
+            </div>
+            
+            <textarea id="output" onclick="handleSentenceSelection(event)" oninput="updateWordCount()" placeholder="Your generated essay will appear here..."></textarea>
+            
+            <div class="font-size-container">
+                <div class="font-size-header">
+                    <label id="font-size-label" class="font-size-label">Font Size:</label>
+                    <span id="font-size-value" class="font-size-value">18px</span>
+                </div>
+                
+                <div class="font-size-presets">
+                    <button class="font-preset-btn" onclick="setFontSize(14)">Small</button>
+                    <button class="font-preset-btn active" onclick="setFontSize(18)">Medium</button>
+                    <button class="font-preset-btn" onclick="setFontSize(22)">Large</button>
+                    <button class="font-preset-btn" onclick="setFontSize(28)">X-Large</button>
+                </div>
+                
+                <div class="font-size-slider-container">
+                    <button class="font-size-btn" onclick="decreaseFontSize()" title="Decrease font size">−</button>
+                    <input type="range" id="font-size-slider" min="12" max="36" step="1" value="18" oninput="changeFontSize()">
+                    <button class="font-size-btn" onclick="increaseFontSize()" title="Increase font size">+</button>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="sentence-options" style="display: none; position: absolute; background: white; padding: 5px;">
         <button onclick="improveSentence()">Improve</button>
@@ -335,13 +815,23 @@
             const length = document.getElementById("length").value.trim();
             const note = document.getElementById("note").value.trim();
             const output = document.getElementById("output");
+            const generateBtn = document.getElementById("generate-button");
 
             if (!topic || !length || isNaN(length) || length <= 0) {
-                alert("⚠ Please enter a valid topic and word count.");
+                showNotification("⚠️ Please enter a valid topic and word count.", "warning");
                 return;
             }
 
-            output.value = "Generating essay..."; 
+            if (length < 50 || length > 5000) {
+                showNotification("⚠️ Word count should be between 50 and 5000.", "warning");
+                return;
+            }
+
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.classList.add("loading");
+            generateBtn.textContent = "";
+            output.value = "🤖 AI is crafting your essay...\n\n✨ This may take a few moments depending on the length and complexity of your request."; 
 
             try {
                 const userDeviceInfo = getUserDeviceInfo();
@@ -364,15 +854,69 @@
                 const data = await response.json();
                 if (data.essay) {
                     output.value = data.essay;
-                        const wordCount = updateWordCount();
-                        saveHistory(topic, data.essay, wordCount);
+                    const wordCount = updateWordCount();
+                    saveHistory(topic, data.essay, wordCount);
+                    showNotification("✅ Essay generated successfully!", "success");
                 } else {
                     throw new Error(data.error || "Failed to generate essay.");
                 }
             } catch (error) {
-                alert(`❌ Error: ${error.message}`);
+                showNotification(`❌ Error: ${error.message}`, "error");
                 output.value = "";
+            } finally {
+                // Reset button
+                generateBtn.disabled = false;
+                generateBtn.classList.remove("loading");
+                generateBtn.textContent = "🚀 Generate Essay";
             }
+        }
+
+        function showNotification(message, type = "info") {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(n => n.remove());
+
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // Add styles
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                border-radius: 12px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                box-shadow: var(--shadow-lg);
+                animation: slideInRight 0.3s ease;
+            `;
+
+            // Set background color based on type
+            switch(type) {
+                case 'success':
+                    notification.style.background = 'linear-gradient(135deg, var(--success-color), #22c55e)';
+                    break;
+                case 'error':
+                    notification.style.background = 'linear-gradient(135deg, var(--danger-color), #dc2626)';
+                    break;
+                case 'warning':
+                    notification.style.background = 'linear-gradient(135deg, var(--warning-color), #f59e0b)';
+                    break;
+                default:
+                    notification.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+            }
+
+            document.body.appendChild(notification);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
         }
 
 
@@ -435,9 +979,24 @@
         }
 
         function copyText() {
-            navigator.clipboard.writeText(document.getElementById("output").value)
-                .then(() => alert("Copied to clipboard!"))
-                .catch(() => alert("Failed to copy text."));
+            const output = document.getElementById("output");
+            const text = output.value.trim();
+            
+            if (!text) {
+                showNotification("⚠️ No essay to copy!", "warning");
+                return;
+            }
+
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    showNotification("📋 Essay copied to clipboard!", "success");
+                })
+                .catch(() => {
+                    // Fallback for older browsers
+                    output.select();
+                    document.execCommand('copy');
+                    showNotification("📋 Essay copied to clipboard!", "success");
+                });
         }
 
          function toggleFullscreen() {
@@ -446,23 +1005,28 @@
              else document.exitFullscreen();
          }
 
-            async function exportEssay() {
-                const response = await fetch("/getEssays");
-                const essays = await response.json();
-
-                if (essays.length === 0) {
-                    return alert("⚠ No essays available for export!");
+            function exporttoword() {
+                const output = document.getElementById("output");
+                const topic = document.getElementById("topic").value.trim();
+                const text = output.value.trim();
+                
+                if (!text) {
+                    showNotification("⚠️ No essay to export!", "warning");
+                    return;
                 }
 
-                const essayId = essays[0]._id; // Change this to select the correct essay
-                const downloadUrl = `/export-docx/${essayId}`;
-
+                // For now, we'll create a simple text download since we need the essay ID for DOCX export
+                const blob = new Blob([text], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
                 const link = document.createElement("a");
-                link.href = downloadUrl;
-                link.download = "exported_essay.docx";
+                link.href = url;
+                link.download = `${topic || 'essay'}.txt`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification("📥 Essay exported as text file!", "success");
             }
 
         let selectedSentence = "";
@@ -576,14 +1140,94 @@
 
         function changeFontSize() {
             const slider = document.getElementById("font-size-slider");
-            const label = document.getElementById("font-size-label");
-            const output = document.getElementById("output"); // Ensure the essay output has this ID
+            const valueDisplay = document.getElementById("font-size-value");
+            const output = document.getElementById("output");
 
-            label.textContent = slider.value + "px";
+            valueDisplay.textContent = slider.value + "px";
             if (output) {
                 output.style.fontSize = slider.value + "px";
             }
+            
+            // Update slider progress fill
+            updateSliderProgress(slider);
+            
+            // Update preset button states
+            updatePresetButtons(parseInt(slider.value));
         }
+
+        function updateSliderProgress(slider) {
+            const min = slider.min || 12;
+            const max = slider.max || 36;
+            const value = slider.value;
+            const progress = ((value - min) / (max - min)) * 100;
+            
+            slider.style.setProperty('--slider-progress', progress + '%');
+        }
+
+        function setFontSize(size) {
+            const slider = document.getElementById("font-size-slider");
+            const valueDisplay = document.getElementById("font-size-value");
+            const output = document.getElementById("output");
+
+            slider.value = size;
+            valueDisplay.textContent = size + "px";
+            if (output) {
+                output.style.fontSize = size + "px";
+            }
+            
+            // Update slider progress fill
+            updateSliderProgress(slider);
+            
+            // Update preset button states
+            updatePresetButtons(size);
+        }
+
+        function increaseFontSize() {
+            const slider = document.getElementById("font-size-slider");
+            const currentSize = parseInt(slider.value);
+            const newSize = Math.min(36, currentSize + 2);
+            setFontSize(newSize);
+        }
+
+        function decreaseFontSize() {
+            const slider = document.getElementById("font-size-slider");
+            const currentSize = parseInt(slider.value);
+            const newSize = Math.max(12, currentSize - 2);
+            setFontSize(newSize);
+        }
+
+        function updatePresetButtons(currentSize) {
+            const presetButtons = document.querySelectorAll('.font-preset-btn');
+            const presetSizes = [14, 18, 22, 28];
+            
+            presetButtons.forEach((button, index) => {
+                button.classList.remove('active');
+                if (presetSizes[index] === currentSize) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
+        // Add keyboard shortcuts for font size
+        document.addEventListener('keydown', function(event) {
+            // Ctrl/Cmd + Plus/Minus for font size adjustment
+            if ((event.ctrlKey || event.metaKey) && event.target.id === 'output') {
+                if (event.key === '=' || event.key === '+') {
+                    event.preventDefault();
+                    increaseFontSize();
+                    showNotification("🔍 Font size increased", "info");
+                } else if (event.key === '-') {
+                    event.preventDefault();
+                    decreaseFontSize();
+                    showNotification("🔍 Font size decreased", "info");
+                }
+            }
+        });
+
+        // Initialize font size on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            changeFontSize();
+        });
 
     </script>
 </body>

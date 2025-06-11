@@ -44,14 +44,14 @@ MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database
 GEMINI_API_KEY=your_gemini_api_key_here
 
 # Vercel Blob Storage Token (required for file uploads)
-BLOB_READ_WRITE_TOKEN=your_vercel_blob_token_here
+BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN=your_vercel_blob_token_here
 ```
 
 ### Step 2: Get Vercel Blob Token
 1. Go to your Vercel dashboard
 2. Navigate to Storage → Blob
 3. Create a new Blob store or use existing one
-4. Copy the `BLOB_READ_WRITE_TOKEN` from the store settings
+4. Copy the `BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN` from the store settings
 
 ### Step 3: Deploy
 1. **Connect Repository**: Link your GitHub repository to Vercel

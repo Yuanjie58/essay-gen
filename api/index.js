@@ -91,7 +91,7 @@ const videoSchema = new mongoose.Schema({
 const Video = mongoose.model("Video", videoSchema);
 
 // Check if we're in production (Vercel) or development
-const isProduction = process.env.VERCEL || process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN !== 'your_vercel_blob_token_here';
+const isProduction = process.env.VERCEL || (process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN && process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN !== 'your_vercel_blob_token_here');
 
 // Configure multer for video uploads
 const storage = isProduction ? 

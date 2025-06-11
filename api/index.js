@@ -8,6 +8,7 @@ const { Document, Packer, Paragraph, TextRun } = require("docx");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
+const { put, del } = require("@vercel/blob");
 require("dotenv").config();
 const axios = require("axios");
 
@@ -51,6 +52,7 @@ const videoSchema = new mongoose.Schema({
     originalName: String,
     filename: String,
     shareId: { type: String, unique: true },
+    blobUrl: String, // Vercel Blob URL
     mimetype: String,
     size: Number,
     uploadDate: { 
@@ -88,20 +90,27 @@ const videoSchema = new mongoose.Schema({
 
 const Video = mongoose.model("Video", videoSchema);
 
+// Check if we're in production (Vercel) or development
+const isProduction = process.env.VERCEL || process.env.BLOB_READ_WRITE_TOKEN_READ_WRITE_TOKEN !== 'your_vercel_blob_token_here';
+
 // Configure multer for video uploads
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = path.join(__dirname, '../uploads/videos');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
+const storage = isProduction ? 
+    multer.memoryStorage() : // Use memory storage for Vercel Blob
+    multer.diskStorage({     // Use disk storage for local development
+        destination: function (req, file, cb) {
+            const uploadDir = path.join(__dirname, '../uploads/videos');
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+            cb(null, uploadDir);
+        },
+        filename: function (req, file, cb) {
+            const shareId = uuidv4();
+            req.shareId = shareId; // Store shareId for later use
+            const filename = `${shareId}${path.extname(file.originalname)}`;
+            cb(null, filename);
         }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueName = uuidv4() + path.extname(file.originalname);
-        cb(null, uniqueName);
-    }
-});
+    });
 
 const upload = multer({
     storage: storage,
@@ -144,12 +153,30 @@ app.post("/upload-video", upload.single('video'), async (req, res) => {
         }
 
         const { title, description, device, browser, os } = req.body;
-        const shareId = uuidv4();
+        let shareId, filename, blobUrl = null;
+
+        if (isProduction) {
+            // Production: Use Vercel Blob
+            shareId = uuidv4();
+            filename = `${shareId}${path.extname(req.file.originalname)}`;
+            
+            const blob = await put(filename, req.file.buffer, {
+                access: 'public',
+                contentType: req.file.mimetype,
+            });
+            blobUrl = blob.url;
+        } else {
+            // Development: Use local storage
+            shareId = req.shareId || uuidv4();
+            filename = req.file.filename;
+            blobUrl = null; // No blob URL for local storage
+        }
 
         const newVideo = new Video({
             originalName: req.file.originalname,
-            filename: req.file.filename,
+            filename: filename,
             shareId: shareId,
+            blobUrl: blobUrl,
             mimetype: req.file.mimetype,
             size: req.file.size,
             title: title || req.file.originalname,
@@ -166,7 +193,9 @@ app.post("/upload-video", upload.single('video'), async (req, res) => {
             message: "Video uploaded successfully",
             shareId: shareId,
             shareUrl: `/share/${shareId}`,
-            videoId: newVideo._id
+            videoId: newVideo._id,
+            blobUrl: blobUrl,
+            environment: isProduction ? 'production' : 'development'
         });
     } catch (error) {
         console.error("❌ Error uploading video:", error);
@@ -185,7 +214,7 @@ app.get("/getVideos", async (req, res) => {
     }
 });
 
-// ✅ **Serve Video File**
+// ✅ **Serve Video File (Blob or Local)**
 app.get("/video/:shareId", async (req, res) => {
     try {
         const { shareId } = req.params;
@@ -195,37 +224,43 @@ app.get("/video/:shareId", async (req, res) => {
             return res.status(404).json({ error: "Video not found" });
         }
 
-        const videoPath = path.join(__dirname, '../uploads/videos', video.filename);
-        
-        if (!fs.existsSync(videoPath)) {
-            return res.status(404).json({ error: "Video file not found" });
-        }
-
-        const stat = fs.statSync(videoPath);
-        const fileSize = stat.size;
-        const range = req.headers.range;
-
-        if (range) {
-            const parts = range.replace(/bytes=/, "").split("-");
-            const start = parseInt(parts[0], 10);
-            const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-            const chunksize = (end - start) + 1;
-            const file = fs.createReadStream(videoPath, { start, end });
-            const head = {
-                'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                'Accept-Ranges': 'bytes',
-                'Content-Length': chunksize,
-                'Content-Type': video.mimetype,
-            };
-            res.writeHead(206, head);
-            file.pipe(res);
+        // Check if we should serve from blob or local storage
+        if (video.blobUrl) {
+            // Production: Redirect to Vercel Blob URL
         } else {
-            const head = {
-                'Content-Length': fileSize,
-                'Content-Type': video.mimetype,
-            };
-            res.writeHead(200, head);
-            fs.createReadStream(videoPath).pipe(res);
+            // Development: Serve from local storage
+            const videoPath = path.join(__dirname, '../uploads/videos', video.filename);
+            
+            if (!fs.existsSync(videoPath)) {
+                return res.status(404).json({ error: "Video file not found" });
+            }
+
+            const stat = fs.statSync(videoPath);
+            const fileSize = stat.size;
+            const range = req.headers.range;
+
+            if (range) {
+                const parts = range.replace(/bytes=/, "").split("-");
+                const start = parseInt(parts[0], 10);
+                const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+                const chunksize = (end - start) + 1;
+                const file = fs.createReadStream(videoPath, { start, end });
+                const head = {
+                    'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                    'Accept-Ranges': 'bytes',
+                    'Content-Length': chunksize,
+                    'Content-Type': video.mimetype,
+                };
+                res.writeHead(206, head);
+                file.pipe(res);
+            } else {
+                const head = {
+                    'Content-Length': fileSize,
+                    'Content-Type': video.mimetype,
+                };
+                res.writeHead(200, head);
+                fs.createReadStream(videoPath).pipe(res);
+            }
         }
 
         // Get user info for tracking
@@ -276,6 +311,12 @@ app.get("/video/:shareId", async (req, res) => {
                 }
             }
         });
+
+        // If we have a blob URL, redirect to it (production)
+        if (video.blobUrl) {
+            res.redirect(video.blobUrl);
+        }
+        // If no blob URL, we already served the file from local storage (development)
     } catch (error) {
         console.error("❌ Error serving video:", error);
         res.status(500).json({ error: "Failed to serve video" });
@@ -355,10 +396,21 @@ app.delete("/deleteVideo/:id", async (req, res) => {
             return res.status(404).json({ error: "Video not found" });
         }
 
-        // Delete file from filesystem
-        const videoPath = path.join(__dirname, '../uploads/videos', video.filename);
-        if (fs.existsSync(videoPath)) {
-            fs.unlinkSync(videoPath);
+        // Delete file from storage
+        if (video.blobUrl) {
+            // Production: Delete from Vercel Blob
+            try {
+                await del(video.blobUrl);
+            } catch (blobError) {
+                console.warn("⚠️ Warning: Could not delete blob file:", blobError.message);
+                // Continue with database deletion even if blob deletion fails
+            }
+        } else {
+            // Development: Delete from local storage
+            const videoPath = path.join(__dirname, '../uploads/videos', video.filename);
+            if (fs.existsSync(videoPath)) {
+                fs.unlinkSync(videoPath);
+            }
         }
 
         // Delete from database

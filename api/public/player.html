@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .video-container {
+            background: #111;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .video-player {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            display: block;
+        }
+
+        .video-info {
+            padding: 30px;
+            background: #1a1a1a;
+        }
+
+        .video-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .video-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .video-description {
+            color: #ddd;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .share-section {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .share-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .share-link {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            margin: 10px 0;
+            word-break: break-all;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+        }
+
+        .social-share {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: transform 0.3s;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .social-btn.facebook { background: #3b5998; }
+        .social-btn.twitter { background: #1da1f2; }
+        .social-btn.whatsapp { background: #25d366; }
+        .social-btn.telegram { background: #0088cc; }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #ccc;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #ff6b6b;
+        }
+
+        .spinner {
+            border: 4px solid #333;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .video-info {
+                padding: 20px;
+            }
+            
+            .video-title {
+                font-size: 1.4rem;
+            }
+            
+            .video-meta {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .share-link {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .social-share {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎥 Video Player</h1>
+    </div>
+
+    <div class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="/videos">📹 Upload Videos</a>
+        <a href="/admin">⚙️ Admin</a>
+    </div>
+
+    <div class="container">
+        <div id="loadingSection" class="loading">
+            <div class="spinner"></div>
+            <p>Loading video...</p>
+        </div>
+
+        <div id="errorSection" class="error" style="display: none;">
+            <h2>❌ Video Not Found</h2>
+            <p>The video you're looking for doesn't exist or has been removed.</p>
+            <a href="/videos" class="download-btn">📹 Upload New Video</a>
+        </div>
+
+        <div id="videoSection" style="display: none;">
+            <div class="video-container">
+                <video id="videoPlayer" class="video-player" controls preload="metadata">
+                    <source id="videoSource" src="" type="">
+                    Your browser does not support the video tag.
+                </video>
+                
+                <div class="video-info">
+                    <h1 id="videoTitle" class="video-title">Loading...</h1>
+                    
+                    <div class="video-meta">
+                        <div class="meta-item">
+                            <span>👁️</span>
+                            <span id="videoViews">0 views</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📅</span>
+                            <span id="videoDate">Loading...</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📁</span>
+                            <span id="videoSize">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="videoDescription" class="video-description">
+                        Loading description...
+                    </div>
+
+                    <div class="share-section">
+                        <h3 class="share-title">📤 Share this video</h3>
+                        
+                        <div class="share-link">
+                            <span id="shareUrl">Loading...</span>
+                            <button class="copy-btn" onclick="copyShareLink()">📋 Copy</button>
+                        </div>
+
+                        <div class="social-share">
+                            <a href="#" id="facebookShare" class="social-btn facebook" target="_blank">📘 Facebook</a>
+                            <a href="#" id="twitterShare" class="social-btn twitter" target="_blank">🐦 Twitter</a>
+                            <a href="#" id="whatsappShare" class="social-btn whatsapp" target="_blank">💬 WhatsApp</a>
+                            <a href="#" id="telegramShare" class="social-btn telegram" target="_blank">✈️ Telegram</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get share ID from URL
+        const pathParts = window.location.pathname.split('/');
+        const shareId = pathParts[pathParts.length - 1];
+
+        async function loadVideo() {
+            try {
+                // Fetch video info
+                const response = await fetch(`/video-info/${shareId}`);
+                
+                if (!response.ok) {
+                    throw new Error('Video not found');
+                }
+                
+                const videoInfo = await response.json();
+                
+                // Hide loading, show video
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('videoSection').style.display = 'block';
+                
+                // Set video source
+                const videoPlayer = document.getElementById('videoPlayer');
+                const videoSource = document.getElementById('videoSource');
+                videoSource.src = `/video/${shareId}`;
+                videoSource.type = 'video/mp4'; // Default type
+                videoPlayer.load();
+                
+                // Update video info
+                document.getElementById('videoTitle').textContent = videoInfo.title;
+                document.getElementById('videoViews').textContent = `${videoInfo.views} views`;
+                document.getElementById('videoDate').textContent = new Date(videoInfo.uploadDate).toLocaleDateString();
+                document.getElementById('videoSize').textContent = `${(videoInfo.size / (1024 * 1024)).toFixed(2)} MB`;
+                document.getElementById('videoDescription').textContent = videoInfo.description || 'No description provided.';
+                
+                // Update page title
+                document.title = `${videoInfo.title} - Video Player`;
+                
+                // Setup share links
+                setupShareLinks(videoInfo.title);
+                
+            } catch (error) {
+                console.error('Error loading video:', error);
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('errorSection').style.display = 'block';
+            }
+        }
+
+        function setupShareLinks(title) {
+            const currentUrl = window.location.href;
+            const encodedUrl = encodeURIComponent(currentUrl);
+            const encodedTitle = encodeURIComponent(title);
+            
+            // Update share URL display
+            document.getElementById('shareUrl').textContent = currentUrl;
+            
+            // Setup social share links
+            document.getElementById('facebookShare').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            document.getElementById('twitterShare').href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+            document.getElementById('whatsappShare').href = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+            document.getElementById('telegramShare').href = `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`;
+        }
+
+        function copyShareLink() {
+            const shareUrl = document.getElementById('shareUrl').textContent;
+            navigator.clipboard.writeText(shareUrl).then(() => {
+                showAlert('Share link copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = shareUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showAlert('Share link copied to clipboard!');
+            });
+        }
+
+        function showAlert(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        // Video player event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVideo();
+            
+            // Add video player event listeners
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            videoPlayer.addEventListener('loadstart', () => {
+                console.log('Video loading started');
+            });
+            
+            videoPlayer.addEventListener('canplay', () => {
+                console.log('Video can start playing');
+            });
+            
+            videoPlayer.addEventListener('error', (e) => {
+                console.error('Video error:', e);
+                showAlert('Error loading video. Please try again.');
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            if (e.target.tagName.toLowerCase() !== 'input' && e.target.tagName.toLowerCase() !== 'textarea') {
+                switch(e.code) {
+                    case 'Space':
+                        e.preventDefault();
+                        if (videoPlayer.paused) {
+                            videoPlayer.play();
+                        } else {
+                            videoPlayer.pause();
+                        }
+                        break;
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        videoPlayer.currentTime -= 10;
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        videoPlayer.currentTime += 10;
+                        break;
+                    case 'KeyF':
+                        e.preventDefault();
+                        if (videoPlayer.requestFullscreen) {
+                            videoPlayer.requestFullscreen();
+                        }
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

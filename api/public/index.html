@@ -65,6 +65,37 @@
             color: var(--gray-800);
         }
 
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
         .container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -641,6 +672,14 @@
     </style>
 </head>
 <body>
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="/">🏠 Essay Generator</a>
+            <a href="/videos">📹 Video Upload</a>
+            <a href="/admin">⚙️ Admin</a>
+        </div>
+    </div>
+    
     <div class="container">
         <h1 id="title">Essay Generator by Yuan Jie</h1>
 

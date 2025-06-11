@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Upload & Share</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #764ba2;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .upload-section {
+            margin-bottom: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f4ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .result-section {
+            display: none;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .share-link {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .video-list {
+            margin-top: 40px;
+        }
+
+        .video-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .video-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .video-meta {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .video-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎥 Video Upload & Share</h1>
+            <p>Upload your videos and share them with the world</p>
+        </div>
+
+        <div class="nav-links">
+            <a href="/">🏠 Home</a>
+            <a href="/videos">📹 Videos</a>
+            <a href="/admin">⚙️ Admin</a>
+        </div>
+
+        <div class="content">
+            <div class="upload-section">
+                <h2>Upload New Video</h2>
+                
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📹</div>
+                        <h3>Drop your video here or click to browse</h3>
+                        <p>Supported formats: MP4, AVI, MOV, WMV (Max: 100MB)</p>
+                        <input type="file" id="videoFile" name="video" accept="video/*" style="display: none;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title">Video Title</label>
+                        <input type="text" id="title" name="title" placeholder="Enter video title">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description (Optional)</label>
+                        <textarea id="description" name="description" rows="3" placeholder="Enter video description"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" id="uploadBtn">
+                        📤 Upload Video
+                    </button>
+
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Uploading... 0%</div>
+                    </div>
+                </form>
+
+                <div class="result-section" id="resultSection">
+                    <h3>✅ Video Uploaded Successfully!</h3>
+                    <p>Your video has been uploaded and is ready to share.</p>
+                    
+                    <div class="share-link" id="shareLink"></div>
+                    <button class="copy-btn" onclick="copyShareLink()">📋 Copy Link</button>
+                    
+                    <div style="margin-top: 20px;">
+                        <a href="#" id="viewVideoLink" class="btn-small btn-view" target="_blank">👁️ View Video</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="video-list">
+                <h2>Recent Videos</h2>
+                <div id="videosList">
+                    <p>Loading videos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get device info
+        function getDeviceInfo() {
+            const userAgent = navigator.userAgent;
+            let device = 'Desktop';
+            let browser = 'Unknown';
+            let os = 'Unknown';
+
+            // Detect device
+            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
+                device = 'Mobile';
+            } else if (/iPad/i.test(userAgent)) {
+                device = 'Tablet';
+            }
+
+            // Detect browser
+            if (userAgent.includes('Chrome')) browser = 'Chrome';
+            else if (userAgent.includes('Firefox')) browser = 'Firefox';
+            else if (userAgent.includes('Safari')) browser = 'Safari';
+            else if (userAgent.includes('Edge')) browser = 'Edge';
+
+            // Detect OS
+            if (userAgent.includes('Windows')) os = 'Windows';
+            else if (userAgent.includes('Mac')) os = 'macOS';
+            else if (userAgent.includes('Linux')) os = 'Linux';
+            else if (userAgent.includes('Android')) os = 'Android';
+            else if (userAgent.includes('iOS')) os = 'iOS';
+
+            return { device, browser, os };
+        }
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const videoFile = document.getElementById('videoFile');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const resultSection = document.getElementById('resultSection');
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => {
+            videoFile.click();
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                videoFile.files = files;
+                updateUploadArea(files[0]);
+            }
+        });
+
+        // File selection
+        videoFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                updateUploadArea(e.target.files[0]);
+            }
+        });
+
+        function updateUploadArea(file) {
+            const uploadIcon = uploadArea.querySelector('.upload-icon');
+            const uploadText = uploadArea.querySelector('h3');
+            const uploadSubtext = uploadArea.querySelector('p');
+            
+            uploadIcon.textContent = '✅';
+            uploadText.textContent = `Selected: ${file.name}`;
+            uploadSubtext.textContent = `Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+            
+            // Auto-fill title if empty
+            const titleInput = document.getElementById('title');
+            if (!titleInput.value) {
+                titleInput.value = file.name.replace(/\.[^/.]+$/, "");
+            }
+        }
+
+        // Form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!videoFile.files[0]) {
+                alert('Please select a video file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', videoFile.files[0]);
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            
+            const deviceInfo = getDeviceInfo();
+            formData.append('device', deviceInfo.device);
+            formData.append('browser', deviceInfo.browser);
+            formData.append('os', deviceInfo.os);
+
+            uploadBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            resultSection.style.display = 'none';
+
+            try {
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressFill.style.width = percentComplete + '%';
+                        progressText.textContent = `Uploading... ${Math.round(percentComplete)}%`;
+                    }
+                });
+
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        showUploadSuccess(response);
+                        loadVideos(); // Refresh video list
+                    } else {
+                        const error = JSON.parse(xhr.responseText);
+                        showAlert(error.error || 'Upload failed', 'error');
+                    }
+                    uploadBtn.disabled = false;
+                    progressContainer.style.display = 'none';
+                });
+
+                xhr.addEventListener('error', () => {
+                    showAlert('Upload failed. Please try again.', 'error');
+                    uploadBtn.disabled = false;
+                    progressContainer.style.display = 'none';
+                });
+
+                xhr.open('POST', '/upload-video');
+                xhr.send(formData);
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                showAlert('Upload failed. Please try again.', 'error');
+                uploadBtn.disabled = false;
+                progressContainer.style.display = 'none';
+            }
+        });
+
+        function showUploadSuccess(response) {
+            const shareLink = document.getElementById('shareLink');
+            const viewVideoLink = document.getElementById('viewVideoLink');
+            
+            const fullShareUrl = window.location.origin + response.shareUrl;
+            shareLink.textContent = fullShareUrl;
+            viewVideoLink.href = response.shareUrl;
+            
+            resultSection.style.display = 'block';
+            
+            // Reset form
+            uploadForm.reset();
+            resetUploadArea();
+        }
+
+        function resetUploadArea() {
+            const uploadIcon = uploadArea.querySelector('.upload-icon');
+            const uploadText = uploadArea.querySelector('h3');
+            const uploadSubtext = uploadArea.querySelector('p');
+            
+            uploadIcon.textContent = '📹';
+            uploadText.textContent = 'Drop your video here or click to browse';
+            uploadSubtext.textContent = 'Supported formats: MP4, AVI, MOV, WMV (Max: 100MB)';
+        }
+
+        function copyShareLink() {
+            const shareLink = document.getElementById('shareLink');
+            navigator.clipboard.writeText(shareLink.textContent).then(() => {
+                showAlert('Share link copied to clipboard!', 'success');
+            });
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            const content = document.querySelector('.content');
+            content.insertBefore(alertDiv, content.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // Load videos
+        async function loadVideos() {
+            try {
+                const response = await fetch('/getVideos');
+                const videos = await response.json();
+                
+                const videosList = document.getElementById('videosList');
+                
+                if (videos.length === 0) {
+                    videosList.innerHTML = '<p>No videos uploaded yet.</p>';
+                    return;
+                }
+                
+                videosList.innerHTML = videos.map(video => `
+                    <div class="video-item">
+                        <div class="video-info">
+                            <h4>${video.title}</h4>
+                            <div class="video-meta">
+                                Uploaded: ${new Date(video.uploadDate).toLocaleDateString()} | 
+                                Views: ${video.views} | 
+                                Size: ${(video.size / (1024 * 1024)).toFixed(2)} MB
+                            </div>
+                        </div>
+                        <div class="video-actions">
+                            <a href="/share/${video.shareId}" class="btn-small btn-view" target="_blank">👁️ View</a>
+                            <button class="btn-small btn-delete" onclick="deleteVideo('${video._id}')">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading videos:', error);
+                document.getElementById('videosList').innerHTML = '<p>Error loading videos.</p>';
+            }
+        }
+
+        async function deleteVideo(videoId) {
+            if (!confirm('Are you sure you want to delete this video?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/deleteVideo/${videoId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showAlert('Video deleted successfully!', 'success');
+                    loadVideos();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Failed to delete video', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting video:', error);
+                showAlert('Failed to delete video', 'error');
+            }
+        }
+
+        // Load videos on page load
+        document.addEventListener('DOMContentLoaded', loadVideos);
+    </script>
+</body>
+</html>
